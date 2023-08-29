@@ -61,6 +61,7 @@ public class AppTest {
   public void testEdge() throws IOException, InterruptedException  {
     setupEdge();
     commonTest(edgeDriver);
+    takeScreenShot(edgeDriver, "searchResultEdge.png");
     edgeDriver.quit();
   }
 
@@ -68,6 +69,7 @@ public class AppTest {
   public void testChrome() throws IOException, InterruptedException  {
     setupChrome();
     commonTest(chromeDriver);
+    takeScreenShot(chromeDriver, "searchResultChrome.png");
     chromeDriver.quit();
   }
 
@@ -77,9 +79,7 @@ public class AppTest {
     driver.findElement(By.id("sb_form_q")).click();
     driver.findElement(By.id("sb_form_q")).sendKeys("What is Selenium Testing?");
     driver.findElement(By.id("sb_form_q")).submit();
-    takeScreenShot(driver, "searchResult.png");
     assertTrue("No Exceptions", true);
-    Thread.sleep(10000);   
   }
 
   private void takeScreenShot(WebDriver driver, String fname) throws IOException{
