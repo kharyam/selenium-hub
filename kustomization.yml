@@ -1,0 +1,14 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+#commonLabels:
+#  app.kubernetes.io/name: vcs-infra
+#  app.kubernetes.io/component: selenium
+#  paas.redhat.com/appcode: VCS-001
+resources:
+- Service_account_selenium.yml
+- Deployment_selenium_hub.yml
+- Service_selenium.yml
+- Deployment_selenium_chrome.yml
+- Deployment_selenium_firefox.yml
+- Deployment_selenium_edge.yml
