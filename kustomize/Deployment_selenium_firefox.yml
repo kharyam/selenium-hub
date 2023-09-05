@@ -32,6 +32,8 @@ spec:
           value: selenium
         image: selenium/node-firefox:116.0
         imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: true
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -58,13 +60,21 @@ spec:
           timeoutSeconds: 1
         resources:
           limits:
-            cpu: 1000m
+            cpu: 1
             memory: 2Gi
           requests:
-            cpu: 100m
+            cpu: 100m 
             memory: 128Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
+        volumeMounts:
+        - name: shm
+          mountPath: /dev/shm
+      volumes:
+      - name: shm
+        emptyDir:
+          medium: "Memory"
+            
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
