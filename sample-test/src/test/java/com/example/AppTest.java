@@ -6,7 +6,6 @@ import org.apache.commons.io.FileUtils;
 import static org.junit.Assert.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.chromium.ChromiumOptions;
 import org.openqa.selenium.edge.EdgeOptions;
@@ -22,9 +21,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class AppTest {
-  
-  private static String SELENIUM_HUB_LOCATION = "http://selenium-selenium-hub.apps.ocp.khary.net";
 
+  private static String SELENIUM_HUB_LOCATION = "http://selenium-selenium-hub.apps.ocp.khary.net";
+  private static String TEST_NAME="Screenshot My Session";
   private WebDriver chromeDriver;
   private WebDriver edgeDriver;
   private WebDriver firefoxDriver;
@@ -42,49 +41,38 @@ public class AppTest {
   }
 
   private void setupFirefox(){
-    FirefoxOptions options = new FirefoxOptions();
-    options.addArguments("--sync");
-
+    FirefoxOptions firefoxOptions = new FirefoxOptions();
+    firefoxOptions.setCapability("se:name", TEST_NAME);
     try {
-        firefoxDriver = new RemoteWebDriver(new URL(SELENIUM_HUB_LOCATION), options);
+        firefoxDriver = new RemoteWebDriver(new URL(SELENIUM_HUB_LOCATION), firefoxOptions);
     } catch (MalformedURLException mue) {
         mue.printStackTrace();
-    }    
-
-
+    }
   }
 
   private WebDriver commonSetup(ChromiumOptions<?> options) {
     WebDriver driver=null;
-    
+
     // Important, set these
     options.addArguments("--no-sandbox", "--disable-dev-shm-usage");
 
     // Showing a test name instead of the session id in the Grid UI
-    options.setCapability("se:name", "My Bing Test "); 
+    options.setCapability("se:name", TEST_NAME);
 
     try {
         driver = new RemoteWebDriver(new URL(SELENIUM_HUB_LOCATION), options);
     } catch (MalformedURLException mue) {
         mue.printStackTrace();
-    }    
+    }
 
       return driver;
-  }
-
-  @Test
-  public void testFirefox() throws IOException, InterruptedException  {
-    setupFirefox();
-    commonTest(firefoxDriver);
-    takeScreenShot(firefoxDriver, "searchResultFirefox.png");
-    firefoxDriver.quit();
   }
 
   @Test
   public void testEdge() throws IOException, InterruptedException  {
     setupEdge();
     commonTest(edgeDriver);
-    takeScreenShot(edgeDriver, "searchResultEdge.png");
+    takeScreenShot(edgeDriver, "sessionListEdge.png");
     edgeDriver.quit();
   }
 
@@ -92,17 +80,22 @@ public class AppTest {
   public void testChrome() throws IOException, InterruptedException  {
     setupChrome();
     commonTest(chromeDriver);
-    takeScreenShot(chromeDriver, "searchResultChrome.png");
+    takeScreenShot(chromeDriver, "sessionListChrome.png");
     chromeDriver.quit();
   }
 
+  @Test
+  public void testFirefox() throws IOException, InterruptedException  {
+    setupFirefox();
+    commonTest(firefoxDriver);
+    takeScreenShot(firefoxDriver, "sessionListFirefox.png");
+    firefoxDriver.quit();
+  }
+
   private void commonTest(WebDriver driver) throws IOException, InterruptedException{
-    driver.get("https://www.bing.com/");
+    driver.get(SELENIUM_HUB_LOCATION);
     driver.manage().window().setSize(new Dimension(1200, 800));
-    WebElement searchField = driver.findElement(By.id("sb_form_q"));
-    searchField.click();
-    searchField.sendKeys("What is Selenium Testing?");
-    searchField.submit();
+    driver.findElement(By.cssSelector("#root > div > div.MuiDrawer-root.MuiDrawer-docked.css-1pv7n5u > div > ul > div > a:nth-child(2) > div.MuiListItemText-root.css-1tsvksn > span")).click();
     assertTrue("No Exceptions", true);
   }
 
@@ -113,6 +106,5 @@ public class AppTest {
         imageFileDir="target";
     	FileUtils.copyFile(scrFile, new File(imageFileDir, fname));
 	}
-
 
 }

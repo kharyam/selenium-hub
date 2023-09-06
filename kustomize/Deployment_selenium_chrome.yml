@@ -1,7 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: selenium-selenium-node-chrome
+  name: node-chrome
+  labels:
+    app.kubernetes.io/part-of: Nodes
+    app.kubernetes.io/component: backend
+  annotations:
+    app.openshift.io/connects-to: hub
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
@@ -9,7 +14,7 @@ spec:
   selector:
     matchLabels:
       app: selenium
-      deployment: selenium-selenium-node-chrome
+      deployment: selenium-node-chrome
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -20,7 +25,7 @@ spec:
       creationTimestamp: null
       labels:
         app: selenium
-        deployment: selenium-selenium-node-chrome
+        deployment: selenium-node-chrome
     spec:
       containers:
       - env:
@@ -30,6 +35,8 @@ spec:
           value: "4443"
         - name: SE_EVENT_BUS_HOST
           value: selenium
+        - name: SE_OFFLINE
+          value: "true"
         image: selenium/node-chrome:115.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
@@ -58,17 +65,25 @@ spec:
           timeoutSeconds: 1
         resources:
           limits:
-            cpu: 1000m
+            cpu: 1
             memory: 2Gi
           requests:
             cpu: 100m
             memory: 256Mi
+        securityContext:
+          capabilities:
+            drop:
+              - ALL
+          allowPrivilegeEscalation: false
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      securityContext: {}
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
       serviceAccount: selenium
       serviceAccountName: selenium
       terminationGracePeriodSeconds: 30

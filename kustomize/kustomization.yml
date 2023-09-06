@@ -12,3 +12,10 @@ resources:
 - Deployment_selenium_chrome.yml
 - Deployment_selenium_firefox.yml
 - Deployment_selenium_edge.yml
+replicas:
+- name: node-chrome
+  count: 2
+- name: node-edge
+  count: 2
+- name: node-firefox
+  count: 2

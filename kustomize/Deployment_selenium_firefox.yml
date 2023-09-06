@@ -1,7 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: selenium-selenium-node-firefox
+  name: node-firefox
+  labels:
+    app.kubernetes.io/part-of: Nodes
+    app.kubernetes.io/component: backend
+  annotations:
+    app.openshift.io/connects-to: hub
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
@@ -9,7 +14,7 @@ spec:
   selector:
     matchLabels:
       app: selenium
-      deployment: selenium-selenium-node-firefox
+      deployment: selenium-node-firefox
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -20,7 +25,7 @@ spec:
       creationTimestamp: null
       labels:
         app: selenium
-        deployment: selenium-selenium-node-firefox
+        deployment: selenium-node-firefox
     spec:
       containers:
       - env:
@@ -30,10 +35,12 @@ spec:
           value: "4443"
         - name: SE_EVENT_BUS_HOST
           value: selenium
+        - name: SE_OFFLINE
+          value: "true"
+        - name: SE_JAVA_OPTS
+          value: -Xmx512m
         image: selenium/node-firefox:116.0
         imagePullPolicy: IfNotPresent
-        securityContext:
-          allowPrivilegeEscalation: true
         livenessProbe:
           failureThreshold: 3
           httpGet:
@@ -63,22 +70,24 @@ spec:
             cpu: 1
             memory: 2Gi
           requests:
-            cpu: 100m 
+            cpu: 100m
             memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: true
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
         - name: shm
           mountPath: /dev/shm
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        runAsNonRoot: true
+      serviceAccount: selenium
+      serviceAccountName: selenium
+      terminationGracePeriodSeconds: 30
       volumes:
       - name: shm
         emptyDir:
           medium: "Memory"
-            
-      dnsPolicy: ClusterFirst
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      serviceAccount: selenium
-      serviceAccountName: selenium
-      terminationGracePeriodSeconds: 30
