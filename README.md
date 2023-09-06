@@ -1,5 +1,7 @@
 # Selenium hub on OCP
 
+This has been tested successfully on OCP 4.12 and 4.13
+
 ## kustomize
 
 kustomize configuration for deploying selenium hub and nodes on OCP.
